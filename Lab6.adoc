@@ -2,17 +2,17 @@
 
 = Лабораторная №6
 :toc:
-:toc-title: ОГЛАВЛЕНИЕ:
+:toc-title: ОГЛАВЛЕНИЕ
 
 == Задание
 
-* Написать программу, которая по нажатию на User Button зажигает все (4) светодиоды, по следующему нажатию тушит все (4) светодиоды. 
+* Написать программу, которая по нажатию на User Button зажигает все (4) светодиоды, по следующему нажатию тушит все (4) светодиоды.
 
 ** Нужно настроить правильно порты, на Вход,  Medium Speed, без подтяжек, подтяжка на кнопку есть внешняя, поэтому внутренняя не нужна.
 
 == Работа с программой
 
-. Подключаем необходимые шины. 
+. Подключаем необходимые шины.
 . Назначаем порты диодов на Выход на скорости "Medium Speed", а кнопку на Вход той же скорости.
 
 Код подключения:
@@ -37,29 +37,54 @@ GPIOC::MODER::MODER13::Input::Set();
 [source, c++]
 int main()
 {
-static  uint8_t flag = 0;
-for (;;)
-{
-if(GPIOC::IDR::IDR13::Low::IsSet() && flag==0)
-{
-GPIOA::ODR::ODR5::High::Set();
-GPIOC::ODR::ODR5::High::Set();
-GPIOC::ODR::ODR8::High::Set();
-GPIOC::ODR::ODR9::High::Set();
-flag =1;
-continue;
-}
-if (GPIOC::IDR::IDR13::Low::IsSet() && flag==1)
-{
-GPIOA::ODR::ODR5::Low::Set();
-GPIOC::ODR::ODR5::Low::Set();
-GPIOC::ODR::ODR8::Low::Set();
-GPIOC::ODR::ODR9::Low::Set();
-flag =0;
-continue;
-}
-}
-return 0;
+    int flag = 0;
+    int tick = 0;
+    int tick1 = 0;
+
+    for(;;)
+    {
+      if(GPIOC::IDR::IDR13::Low::IsSet() && flag == 0)
+      {
+        tick1++;
+        flag = 1;
+
+       if(tick1%2 == 0)
+       {
+         GPIOA::ODR::ODR5::High::Set();
+         GPIOC::ODR::ODR5::High::Set();
+         GPIOC::ODR::ODR8::High::Set();
+         GPIOC::ODR::ODR9::High::Set();
+       }
+       else
+       {
+          GPIOA::ODR::ODR5::Low::Set();
+          GPIOC::ODR::ODR5::Low::Set();
+          GPIOC::ODR::ODR8::Low::Set();
+          GPIOC::ODR::ODR9::Low::Set();
+       }
+      }
+      else if(GPIOC::IDR::IDR13::High::IsSet() && flag == 1)
+      {
+        tick++;
+        flag = 0;
+
+        if(tick%2 == 0)
+        {
+          GPIOA::ODR::ODR5::Low::Set();
+          GPIOC::ODR::ODR5::Low::Set();
+          GPIOC::ODR::ODR8::Low::Set();
+          GPIOC::ODR::ODR9::Low::Set();
+        }
+        else
+        {
+          GPIOA::ODR::ODR5::High::Set();
+          GPIOC::ODR::ODR5::High::Set();
+          GPIOC::ODR::ODR8::High::Set();
+          GPIOC::ODR::ODR9::High::Set();
+        }
+      }
+    }
+  return 1;
 }
 
 == Результат раоты программы:
