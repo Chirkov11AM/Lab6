@@ -1,3 +1,4 @@
+
 :figure-caption: Рисунок
 
 = Лабораторная №6
@@ -14,6 +15,9 @@
 
 . Подключаем необходимые шины.
 . Назначаем порты диодов на Выход на скорости "Medium Speed", а кнопку на Вход той же скорости.
+
+.Схема подключения портов на плате STM32F411
+image::1.png[]
 
 Код подключения:
 
@@ -37,56 +41,24 @@ GPIOC::MODER::MODER13::Input::Set();
 [source, c++]
 int main()
 {
-    int flag = 0;
-    int tick = 0;
-    int tick1 = 0;
-
-    for(;;)
+ for (;;)
+  {
+ if(GPIOC::IDR::IDR13::Low::IsSet())
     {
-      if(GPIOC::IDR::IDR13::Low::IsSet() && flag == 0)
+      //ждем пока не отпуститсся
+      while(GPIOC::IDR::IDR13::Low::IsSet())
       {
-        tick1++;
-        flag = 1;
-
-       if(tick1%2 == 0)
-       {
-         GPIOA::ODR::ODR5::High::Set();
-         GPIOC::ODR::ODR5::High::Set();
-         GPIOC::ODR::ODR8::High::Set();
-         GPIOC::ODR::ODR9::High::Set();
-       }
-       else
-       {
-          GPIOA::ODR::ODR5::Low::Set();
-          GPIOC::ODR::ODR5::Low::Set();
-          GPIOC::ODR::ODR8::Low::Set();
-          GPIOC::ODR::ODR9::Low::Set();
-       }
       }
-      else if(GPIOC::IDR::IDR13::High::IsSet() && flag == 1)
-      {
-        tick++;
-        flag = 0;
-
-        if(tick%2 == 0)
-        {
-          GPIOA::ODR::ODR5::Low::Set();
-          GPIOC::ODR::ODR5::Low::Set();
-          GPIOC::ODR::ODR8::Low::Set();
-          GPIOC::ODR::ODR9::Low::Set();
-        }
-        else
-        {
-          GPIOA::ODR::ODR5::High::Set();
-          GPIOC::ODR::ODR5::High::Set();
-          GPIOC::ODR::ODR8::High::Set();
-          GPIOC::ODR::ODR9::High::Set();
-        }
-      }
+    led1.Toggle();
+    led2.Toggle();
+    led3.Toggle();
+    led4.Toggle();
     }
-  return 1;
+     delay(1000000);
+}
+return 0;
 }
 
-== Результат раоты программы:
+== Результат работы программы:
 
 image::1.gif[]
